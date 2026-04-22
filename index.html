@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculateur BaZi 八字</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:transparent;color:#222;padding:0;margin:0;overflow-x:hidden}
+.app{max-width:1050px;margin:0 auto;padding:0.5rem 0.5rem}
+.section{background:#fff;border:0.5px solid #ddd;border-radius:8px;padding:1rem;margin-bottom:12px;text-align:center}
+.sec-title{font-size:11px;color:#888;margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em}
+
+/* Formulaire */
+.form-card{border:1.5px solid #888;border-radius:6px;overflow:hidden;display:inline-flex;flex-direction:column;min-width:320px;max-width:100%;text-align:left}
+.form-row{display:flex;align-items:center;border-bottom:0.5px solid #ccc}
+.form-row:last-child{border-bottom:none}
+.form-label{font-size:11px;color:#666;width:110px;flex-shrink:0;padding:7px 10px;background:#f5f5f3;border-right:0.5px solid #ccc;text-align:right}
+.form-input{padding:5px 10px;flex:1;display:flex;align-items:center}
+.form-input select,.form-input input[type=number]{border:none;background:transparent;color:#222;font-size:13px;font-weight:500;padding:2px 0;outline:none;width:100%;-moz-appearance:textfield}
+.form-input input[type=number]::-webkit-inner-spin-button,.form-input input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+.form-input input[type=text]{border:none;background:transparent;color:#222;font-size:13px;font-weight:500;padding:2px 0;outline:none;width:100%}
+.spinner-wrap{display:flex;align-items:center;flex:1;gap:6px}
+.spin-btns{display:flex;flex-direction:column;gap:1px;flex-shrink:0}
+.spin-btn{width:16px;height:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#999;font-size:9px;line-height:1;user-select:none;border-radius:2px}
+.spin-btn:hover{color:#222;background:#eee}
+.form-btn-row{padding:10px;text-align:center;border-top:1px solid #ccc;background:#f5f5f3}
+.btn{padding:8px 32px;background:#fff;border:0.5px solid #888;border-radius:6px;font-size:13px;font-weight:500;color:#222;cursor:pointer}
+.btn:hover{background:#f0f0ee}
+
+/* Tableau thème */
+.bazi-wrap{border:1.5px solid #888;border-radius:4px;overflow:hidden}
+.bazi-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.bazi-table td{border:0.5px solid #bbb;padding:0;vertical-align:middle}
+.row-label{font-size:10px;color:#777;text-align:center;vertical-align:middle;padding:6px 8px;background:#f5f5f3;width:105px;border-right:1.5px solid #888 !important;line-height:1.4}
+.col-pilier{text-align:center}
+.cell-header{font-size:11px;color:#777;padding:6px 4px;background:#f5f5f3;text-align:center;font-weight:500}
+.cell-data{font-size:12px;color:#222;padding:6px 4px;text-align:center;font-weight:500}
+.cell-tronc{display:flex;flex-direction:column;align-items:center;padding:8px 4px 6px;gap:2px}
+.cell-god{font-size:8px;color:#999;min-height:11px}
+.hs-god{font-size:7px;color:#999}
+.cell-hs{display:flex;flex-direction:column;align-items:center;padding:5px 4px;gap:0}
+.hs-slot{display:flex;flex-direction:column;align-items:center;gap:1px;min-height:42px;justify-content:flex-start;padding-top:2px}
+.cell-stars{font-size:8px;color:#222;padding:5px 4px;text-align:center;line-height:1.6}
+.cell-nayin{font-size:9px;color:#888;padding:5px 4px;text-align:center;line-height:1.3}
+
+/* Maître */
+.dm-section{display:flex;align-items:center;gap:14px}
+.dm-details{flex:1}
+.dm-name{font-size:14px;font-weight:500}
+.dm-sub{font-size:12px;color:#888;margin-top:2px}
+.sbar{height:7px;background:#eee;border-radius:4px;overflow:hidden;margin-top:5px}
+.sbar-fill{height:100%;border-radius:4px}
+.sbar-lbl{font-size:11px;color:#888;margin-top:3px}
+
+/* 5 éléments */
+.elem-bars{display:flex;flex-direction:column;gap:5px}
+.e-row{display:flex;align-items:center;gap:8px}
+.e-name{font-size:12px;width:45px}
+.e-role{font-size:10px;width:75px;color:#888}
+.e-bg{flex:1;height:7px;background:#eee;border-radius:4px;overflow:hidden}
+.e-fill{height:100%;border-radius:4px}
+.e-pct{font-size:11px;color:#888;width:30px;text-align:right}
+
+/* Dayuns */
+.dayuns-outer{overflow-x:auto}.dayuns-inner{min-width:680px}
+.lp-wrap{border:1.5px solid #888;border-radius:4px;overflow:hidden}
+.lp-header-row{display:flex;flex-direction:row-reverse;border-bottom:1.5px solid #888}
+.lp-header-row>div{flex:1;min-width:0;text-align:center;font-size:10px;font-weight:500;color:#777;padding:5px 2px;background:#f5f5f3;border-left:0.5px solid #bbb}
+.lp-header-row>div:last-child{border-left:none}
+.lp-grid-row{display:flex;flex-direction:row-reverse;border-bottom:0.5px solid #bbb}
+.lp-grid-row>*{flex:1;min-width:0;border-left:0.5px solid #bbb}.lp-grid-row>*:last-child{border-left:none}
+.lp-stars-row{display:flex;flex-direction:row-reverse;border-bottom:0.5px solid #bbb}
+.lp-stars-row>*{flex:1;min-width:0;border-left:0.5px solid #bbb}.lp-stars-row>*:last-child{border-left:none}
+.lp-nayin-row{display:flex;flex-direction:row-reverse}
+.lp-nayin-row>*{flex:1;min-width:0;border-left:0.5px solid #bbb}.lp-nayin-row>*:last-child{border-left:none}
+.lp-stars-cell{text-align:center;font-size:7px;color:#222;padding:4px 3px;line-height:1.5;min-height:14px}
+.lp-nayin-cell{text-align:center;font-size:8px;color:#888;padding:4px 3px;line-height:1.3}
+.lp-years-title{font-size:12px;color:#888;margin-top:16px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.lp-years-wrap{border:1.5px solid #888;border-radius:4px;overflow:hidden}
+.lp-years-grid{display:flex;flex-direction:row-reverse;align-items:stretch}
+.lp-years-grid>*{flex:1;min-width:0;border-left:0.5px solid #bbb}.lp-years-grid>*:last-child{border-left:none}
+.lp-years-col{display:flex;flex-direction:column;justify-content:center;gap:3px;padding:5px 3px}
+.lp-year-item{display:flex;align-items:center;gap:3px;padding:1px 0}
+.lp-year-item.cur{background:#f5f5f3;border-radius:3px;padding:1px 3px;margin:0 -3px}
+.lp-year-num{font-size:9px;color:#888;white-space:nowrap;flex-shrink:0;width:28px;text-align:right}
+.lp-col{text-align:center;display:flex;flex-direction:column;overflow:hidden}
+.lp-tronc{display:flex;flex-direction:column;align-items:center;padding:5px 3px 3px;gap:1px}
+.lp-div{height:0.5px;background:#ccc;flex-shrink:0}
+.lp-branch{display:flex;flex-direction:column;align-items:center;padding:5px 3px 3px;gap:1px}
+.lp-hs{display:flex;flex-direction:column;align-items:center;padding:3px;gap:0}
+.lp-hs-slot{display:flex;flex-direction:column;align-items:center;gap:1px;min-height:33px;justify-content:flex-start;padding-top:2px}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="section">
+  <div class="sec-title">Données de naissance</div>
+  <div class="form-card">
+    <div class="form-row"><div class="form-label">Année</div><div class="form-input"><div class="spinner-wrap"><input type="number" id="yr" min="1900" max="2060" value="1986" oninput="updateDayMax()"><div class="spin-btns"><div class="spin-btn" onclick="spin('yr',1,1900,2060);updateDayMax()">▲</div><div class="spin-btn" onclick="spin('yr',-1,1900,2060);updateDayMax()">▼</div></div></div></div></div>
+    <div class="form-row"><div class="form-label">Mois</div><div class="form-input"><select id="mo" onchange="updateDayMax()"><option value="1">Janvier</option><option value="2" selected>Février</option><option value="3">Mars</option><option value="4">Avril</option><option value="5">Mai</option><option value="6">Juin</option><option value="7">Juillet</option><option value="8">Août</option><option value="9">Septembre</option><option value="10">Octobre</option><option value="11">Novembre</option><option value="12">Décembre</option></select></div></div>
+    <div class="form-row"><div class="form-label">Jour</div><div class="form-input"><div class="spinner-wrap"><input type="number" id="dy" min="1" max="28" value="26"><div class="spin-btns"><div class="spin-btn" onclick="spinDay(1)">▲</div><div class="spin-btn" onclick="spinDay(-1)">▼</div></div></div></div></div>
+    <div class="form-row"><div class="form-label">Heure</div><div class="form-input"><div class="spinner-wrap"><input type="text" id="hr" value="12:00" placeholder="HH:MM" maxlength="5"><div class="spin-btns"><div class="spin-btn" onclick="spinTime(1)">▲</div><div class="spin-btn" onclick="spinTime(-1)">▼</div></div></div></div></div>
+    <div class="form-row"><div class="form-label">Genre</div><div class="form-input"><select id="gd"><option value="m">Homme</option><option value="f">Femme</option></select></div></div>
+    <div class="form-btn-row"><button class="btn" id="calcBtn">Calculer mon BaZi →</button></div>
+  </div>
+</div>
+<div id="result" style="display:none;height:0;overflow:hidden;margin:0;padding:0">
+  <div class="section"><div class="sec-title">Les Quatre Piliers 四柱</div><div class="bazi-wrap"><table class="bazi-table" id="baziTable"></table></div></div>
+  <div class="section"><div class="sec-title">Maître du Jour 日主</div><div class="dm-section" id="dmDiv"></div></div>
+  <div class="section"><div class="sec-title">Cinq Éléments & Facteurs</div><div class="elem-bars" id="elemsDiv"></div></div>
+  <div class="section"><div class="sec-title">Grandes Périodes 大运</div>
+    <div class="dayuns-outer"><div class="dayuns-inner">
+      <div class="lp-wrap"><div class="lp-header-row" id="lpHeader"></div><div class="lp-grid-row" id="lpTopGrid"></div><div class="lp-stars-row" id="lpStarsRow"></div><div class="lp-nayin-row" id="lpNayinRow"></div></div>
+      <div class="lp-years-title">ANNÉES 年</div>
+      <div class="lp-years-wrap"><div class="lp-years-grid" id="lpYearsGrid"></div></div>
+    </div></div>
+  </div>
+</div>
+</div>
+<script>
+const ECOLS={Bois:'rgb(92,138,0)',Feu:'rgb(191,63,127)',Terre:'rgb(215,98,19)',Métal:'rgb(162,123,0)',Eau:'rgb(68,114,196)'};
+function isLeap(y){return(y%4===0&&y%100!==0)||(y%400===0);}
+function dim(y,m){return[0,31,isLeap(y)?29:28,31,30,31,30,31,31,30,31,30,31][m];}
+function updateDayMax(){const y=parseInt(document.getElementById('yr').value)||1986,m=parseInt(document.getElementById('mo').value)||1,mx=dim(y,m),el=document.getElementById('dy');el.max=mx;if(parseInt(el.value)>mx)el.value=mx;}
+function spin(id,d,mn,mx){const el=document.getElementById(id);let v=parseInt(el.value)||mn;v+=d;if(v<mn)v=mx;if(v>mx)v=mn;el.value=v;}
+function spinDay(d){const y=parseInt(document.getElementById('yr').value)||1986,m=parseInt(document.getElementById('mo').value)||1;spin('dy',d,1,dim(y,m));}
+function spinTime(d){const el=document.getElementById('hr'),p=el.value.split(':');let h=parseInt(p[0])||0,mn=parseInt(p[1])||0;mn+=d*5;if(mn>=60){mn=0;h++;}if(mn<0){mn=55;h--;}if(h>=24)h=0;if(h<0)h=23;el.value=String(h).padStart(2,'0')+':'+String(mn).padStart(2,'0');}
+function parseTime(s){const p=(s||'').split(':');let h=parseInt(p[0]),mn=parseInt(p[1]);if(isNaN(h))h=0;if(isNaN(mn))mn=0;return{h:Math.max(0,Math.min(23,h)),mn:Math.max(0,Math.min(59,mn))};}
+updateDayMax();
+const MOIS_FR=['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const JIEQI={1900:[4,6,5,6,6,7,8,8,8,8,7,6],1901:[4,6,5,6,6,7,8,8,8,8,7,6],1902:[4,6,5,6,6,7,8,8,8,8,7,6],1903:[4,6,5,6,6,7,8,8,8,8,7,6],1904:[5,7,6,6,7,8,8,9,9,8,8,7],1905:[4,6,5,6,6,7,8,8,8,8,7,6],1906:[4,6,5,6,6,7,8,8,8,8,7,6],1907:[4,6,5,6,6,7,8,8,8,8,7,6],1908:[5,7,5,6,7,7,8,9,9,8,8,7],1909:[4,6,5,6,6,7,8,8,8,8,7,6],1910:[4,6,5,6,6,7,8,8,8,8,7,6],1911:[4,6,5,6,6,7,8,8,8,8,7,6],1912:[5,7,5,6,6,7,8,9,9,8,8,7],1913:[4,6,5,6,6,7,8,8,8,8,7,6],1914:[4,6,5,6,6,7,8,8,8,8,7,6],1915:[4,6,5,6,6,7,8,8,8,8,7,6],1916:[5,7,5,6,6,7,8,8,9,8,8,7],1917:[4,6,5,6,6,7,8,8,8,8,7,6],1918:[4,6,5,6,6,7,8,8,8,8,7,6],1919:[4,6,5,6,6,7,8,8,8,8,7,6],1920:[5,7,5,6,6,7,8,8,9,8,8,7],1921:[4,6,5,6,6,7,8,8,8,8,7,6],1922:[4,6,5,6,6,7,8,8,8,8,7,6],1923:[4,6,5,6,6,7,8,8,8,8,7,6],1924:[5,7,5,6,6,7,8,8,9,8,8,7],1925:[4,6,5,6,6,7,8,8,8,8,7,6],1926:[4,6,5,6,6,7,8,8,8,8,7,6],1927:[4,6,5,6,6,7,8,8,8,8,7,6],1928:[5,7,5,6,6,7,8,8,9,8,8,7],1929:[4,6,5,6,6,7,8,8,8,8,7,6],1930:[4,6,5,6,6,7,8,8,8,8,7,6],1931:[4,6,5,6,6,7,8,8,8,8,7,6],1932:[5,7,5,6,6,7,8,8,9,8,8,7],1933:[4,6,5,6,6,7,8,8,8,8,7,6],1934:[4,6,5,6,6,7,8,8,8,8,7,6],1935:[4,6,5,6,6,7,8,8,8,8,7,6],1936:[5,7,5,6,6,7,8,8,8,8,7,6],1937:[4,6,5,6,6,7,8,8,8,8,7,6],1938:[4,6,5,6,6,7,8,8,8,8,7,6],1939:[4,6,5,6,6,7,8,8,8,8,7,6],1940:[5,7,5,6,6,7,8,8,8,8,7,6],1941:[4,6,5,6,6,7,8,8,8,8,7,6],1942:[4,6,5,6,6,7,8,8,8,8,7,6],1943:[4,6,5,6,6,7,8,8,8,8,7,6],1944:[5,7,5,6,6,7,8,8,8,8,7,6],1945:[4,6,5,6,6,7,8,8,8,8,7,6],1946:[4,6,5,6,6,7,8,8,8,8,7,6],1947:[4,6,5,6,6,7,8,8,8,8,7,6],1948:[5,7,5,6,6,7,8,8,8,8,7,6],1949:[4,6,5,6,6,7,8,8,8,8,7,6],1950:[4,6,6,6,6,7,8,8,8,8,7,6],1951:[4,6,6,6,6,7,8,8,8,8,7,6],1952:[5,7,5,6,6,7,8,8,8,8,7,6],1953:[4,6,5,6,6,7,8,8,8,8,7,6],1954:[4,6,5,6,6,7,8,8,8,8,7,6],1955:[4,6,5,6,6,7,8,8,8,8,7,6],1956:[5,7,5,6,6,7,8,8,8,8,7,6],1957:[4,6,5,6,6,7,8,8,8,8,7,6],1958:[4,6,5,6,6,7,8,8,8,8,7,6],1959:[4,6,5,6,6,7,8,8,8,8,7,6],1960:[5,7,5,6,6,7,8,8,8,8,7,6],1961:[4,6,5,6,6,7,8,8,8,8,7,6],1962:[4,6,5,6,6,7,8,8,8,8,7,6],1963:[4,6,5,6,6,7,8,8,8,8,7,6],1964:[5,7,5,6,6,7,8,8,8,8,7,6],1965:[4,6,5,6,6,7,8,8,8,8,7,6],1966:[4,6,5,6,6,7,8,8,8,8,7,6],1967:[4,6,5,6,6,7,8,8,8,8,7,6],1968:[5,7,5,6,6,7,8,8,8,8,7,6],1969:[4,6,5,6,6,7,8,8,8,8,7,6],1970:[4,6,5,6,6,7,8,8,8,8,7,6],1971:[4,6,5,6,6,7,8,8,8,8,7,6],1972:[5,7,5,6,6,7,8,8,8,8,7,6],1973:[4,6,5,6,6,7,8,8,8,8,7,6],1974:[4,6,5,6,6,7,8,8,8,8,7,6],1975:[4,6,5,6,6,7,8,8,8,8,7,6],1976:[5,7,5,6,6,7,8,8,8,8,7,6],1977:[4,6,5,6,6,7,8,8,8,8,7,6],1978:[4,6,5,6,6,7,8,8,8,8,7,6],1979:[4,6,5,6,6,7,8,8,8,8,7,6],1980:[5,7,5,6,6,7,8,8,8,8,7,6],1981:[4,6,5,6,6,7,8,8,8,8,7,6],1982:[4,6,5,6,6,7,8,8,8,8,7,6],1983:[4,6,5,6,6,7,8,8,8,8,7,6],1984:[5,7,5,6,6,7,8,8,8,8,7,6],1985:[4,6,5,6,6,7,8,8,8,8,7,6],1986:[4,6,5,6,6,7,8,8,8,8,7,6],1987:[4,6,5,6,6,7,8,8,8,8,7,6],1988:[4,6,5,5,6,7,8,8,8,8,7,6],1989:[4,6,5,6,6,7,8,8,8,7,7,6],1990:[4,6,5,6,6,7,8,8,8,8,7,6],1991:[4,6,5,6,6,7,8,8,8,8,7,6],1992:[4,6,4,5,6,7,8,8,8,7,7,6],1993:[4,6,5,6,6,7,8,8,8,8,7,6],1994:[4,6,5,6,6,7,8,8,8,8,7,6],1995:[4,6,5,6,6,7,8,8,8,8,7,6],1996:[4,6,4,5,6,7,8,8,8,7,7,6],1997:[4,6,5,6,6,7,8,8,8,8,7,6],1998:[4,6,5,6,6,7,8,8,8,8,7,6],1999:[4,6,5,6,6,7,8,8,8,8,7,6],2000:[4,6,4,5,6,7,8,8,8,7,7,6],2001:[3,6,5,6,6,7,8,8,8,8,7,6],2002:[4,6,5,6,6,7,8,8,8,8,7,6],2003:[4,6,6,6,6,7,8,8,8,8,7,6],2004:[4,6,4,5,6,7,8,8,8,7,7,6],2005:[4,6,5,6,6,7,8,8,8,8,7,6],2006:[4,6,5,6,6,7,8,8,8,8,7,6],2007:[4,6,5,6,6,7,8,8,8,8,7,6],2008:[4,6,4,5,6,7,8,8,8,7,7,6],2009:[4,6,5,6,6,7,8,8,8,8,7,6],2010:[4,6,5,6,6,7,8,8,8,8,7,6],2011:[4,6,6,6,6,7,8,8,8,8,7,6],2012:[4,6,4,5,6,7,8,8,8,7,7,6],2013:[4,6,5,5,6,7,8,8,8,8,7,6],2014:[4,6,5,6,6,7,8,8,8,8,7,6],2015:[4,6,6,6,6,7,8,8,8,8,7,6],2016:[4,5,4,5,6,7,8,8,8,7,7,6],2017:[3,6,5,5,6,7,8,8,8,8,7,6],2018:[4,6,5,6,6,7,8,8,8,8,7,6],2019:[4,6,5,6,6,7,8,8,8,8,7,6],2020:[4,5,4,5,6,7,8,8,8,7,7,6],2021:[3,6,5,5,6,7,8,8,8,8,7,6],2022:[4,6,5,6,6,7,8,8,8,8,7,6],2023:[4,6,5,6,6,7,8,8,8,8,7,6],2024:[4,5,4,5,6,7,8,8,8,7,7,6],2025:[3,6,5,5,6,7,8,8,8,7,7,6],2026:[4,6,5,6,6,7,8,8,8,8,7,6],2027:[4,6,5,6,6,7,8,8,8,8,7,6],2028:[4,5,4,5,6,7,7,8,8,7,7,5],2029:[3,6,5,5,6,7,8,8,8,7,7,5],2030:[4,6,5,6,6,7,8,8,8,8,7,6],2031:[4,6,5,6,6,7,8,8,8,8,7,6],2032:[4,5,4,5,5,7,7,8,8,7,7,5],2033:[3,6,5,5,6,7,8,8,8,7,7,5],2034:[4,6,5,5,6,7,8,8,8,7,7,6],2035:[4,6,6,6,6,7,8,8,8,8,7,6],2036:[4,5,4,5,5,7,7,8,8,7,7,5],2037:[3,6,5,5,6,7,8,8,8,7,7,5],2038:[4,6,5,5,6,7,8,8,8,7,7,6],2039:[4,6,6,6,6,7,8,8,8,8,7,6],2040:[4,5,4,5,5,7,7,8,8,7,7,5],2041:[3,6,5,5,6,7,8,8,8,7,7,5],2042:[4,6,5,5,6,7,8,8,8,7,7,6],2043:[4,6,6,6,6,7,8,8,8,8,7,6],2044:[4,5,4,5,5,7,7,8,8,7,7,5],2045:[3,6,5,5,6,7,8,8,8,7,7,5],2046:[4,6,5,5,6,7,8,8,8,7,7,6],2047:[4,6,6,6,6,7,8,8,8,8,7,6],2048:[4,5,4,5,5,6,7,8,8,7,7,5],2049:[3,6,5,5,6,7,8,8,8,7,7,5],2050:[4,6,5,5,6,7,8,8,8,7,7,6],2051:[4,6,6,6,6,7,8,8,8,8,7,6],2052:[4,5,4,5,5,6,7,8,8,7,7,5],2053:[3,6,5,5,6,7,8,8,8,7,7,5],2054:[4,6,5,5,6,7,8,8,8,7,7,6],2055:[4,6,6,6,6,7,8,8,8,8,7,6],2056:[4,5,4,5,5,6,7,8,8,7,7,5],2057:[3,6,5,5,6,7,8,8,8,7,7,5],2058:[4,6,5,5,6,7,8,8,8,7,7,6],2059:[4,6,6,6,6,7,8,8,8,8,7,6],2060:[4,5,4,5,5,6,7,8,8,7,7,5]};
+function getBaziMonth(y,m,d){const jq=JIEQI[y]||JIEQI[2000],jN=JIEQI[y+1]||jq,jP=JIEQI[y-1]||jq;const bo=[[y-1,1,jP[11]],[y,2,jq[0]],[y,3,jq[1]],[y,4,jq[2]],[y,5,jq[3]],[y,6,jq[4]],[y,7,jq[5]],[y,8,jq[6]],[y,9,jq[7]],[y,10,jq[8]],[y,11,jq[9]],[y,12,jq[10]],[y+1,1,jN[11]],[y+1,2,jN[0]]];const bm=[1,2,3,4,5,6,7,8,9,10,11,0,1,2];const dt=new Date(y,m-1,d);let r=1;for(let i=0;i<bo.length;i++){const[by,bm2,bd]=bo[i];if(dt>=new Date(by,bm2-1,bd))r=bm[i];}return r;}
+function getMonthTronc(yt,mb){return([2,4,6,8,0][yt%5]+(mb-2+12)%12)%10;}
+const T=[{c:'甲',p:'Jiǎ',e:'Bois',y:1,fr:'Bois Yang'},{c:'乙',p:'Yǐ',e:'Bois',y:0,fr:'Bois Yin'},{c:'丙',p:'Bǐng',e:'Feu',y:1,fr:'Feu Yang'},{c:'丁',p:'Dīng',e:'Feu',y:0,fr:'Feu Yin'},{c:'戊',p:'Wù',e:'Terre',y:1,fr:'Terre Yang'},{c:'己',p:'Jǐ',e:'Terre',y:0,fr:'Terre Yin'},{c:'庚',p:'Gēng',e:'Métal',y:1,fr:'Métal Yang'},{c:'辛',p:'Xīn',e:'Métal',y:0,fr:'Métal Yin'},{c:'壬',p:'Rén',e:'Eau',y:1,fr:'Eau Yang'},{c:'癸',p:'Guǐ',e:'Eau',y:0,fr:'Eau Yin'}];
+const B=[
+  {c:'子',p:'Zǐ', a:'Rat',    e:'Eau',   hs:[9]},
+  {c:'丑',p:'Chǒu',a:'Bœuf', e:'Terre', hs:[5,9,7]},
+  {c:'寅',p:'Yín', a:'Tigre', e:'Bois',  hs:[0,2,4]},
+  {c:'卯',p:'Mǎo', a:'Lièvre',e:'Bois',  hs:[1]},
+  {c:'辰',p:'Chén',a:'Dragon',e:'Terre', hs:[4,1,9]},
+  {c:'巳',p:'Sì',  a:'Serpent',e:'Feu',  hs:[2,6,4]},
+  {c:'午',p:'Wǔ',  a:'Cheval', e:'Feu',  hs:[3,5]},
+  {c:'未',p:'Wèi', a:'Chèvre', e:'Terre',hs:[5,3,1]},
+  {c:'申',p:'Shēn',a:'Singe',  e:'Métal',hs:[6,8,4]},
+  {c:'酉',p:'Yǒu', a:'Coq',    e:'Métal',hs:[7]},
+  {c:'戌',p:'Xū',  a:'Chien',  e:'Terre',hs:[4,7,3]},
+  {c:'亥',p:'Hài', a:'Cochon', e:'Eau',  hs:[8,0]},
+];
+const NY=['Or en feuille','Or en feuille','Feu dans le foyer','Feu dans le foyer','Grande forêt','Grande forêt','Terre bord de route','Terre bord de route','Or tranchant','Or tranchant','Feu sur la montagne','Feu sur la montagne','Eau fond du ravin','Eau fond du ravin','Terre sommet de ville','Terre sommet de ville','Or cire blanche','Or cire blanche','Bois du saule','Bois du saule','Eau de source','Eau de source','Terre du toit','Terre du toit','Tonnerre','Tonnerre','Bois de pin','Bois de pin','Eau courante','Eau courante','Or dans le sable','Or dans le sable','Feu pied de montagne','Feu pied de montagne','Bois des plaines','Bois des plaines','Terre du mur','Terre du mur','Or en feuille','Or en feuille','Feu de la lampe','Feu de la lampe','Eau Voie Lactée','Eau Voie Lactée','Grande terre','Grande terre','Or des épingles','Or des épingles','Bois du mûrier','Bois du mûrier','Grande eau','Grande eau','Terre de sable','Terre de sable','Feu céleste','Feu céleste','Bois de grenadier','Bois de grenadier','Grande mer','Grande mer'];
+const TGN=['Parallèle','Parallèle','Production','Production','Richesse','Richesse','Pouvoir','Pouvoir','Ressource','Ressource'];
+const TGA=[' ↑',' ↓',' ↑',' ↓',' ↑',' ↓',' ↑',' ↓',' ↑',' ↓'];
+function tgL(i){return i<0?'':TGN[i]+TGA[i]}
+const NTB={0:[1,7],1:[0,8],2:[11,9],3:[11,9],4:[1,7],5:[0,8],6:[1,7],7:[2,6],8:[3,5],9:[3,5]};
+const LU=[2,3,5,6,5,6,8,9,11,0],EP=[3,2,6,5,6,5,9,8,0,11],WC=[5,6,8,9,8,9,11,0,2,3],JY=[4,5,7,8,7,8,10,11,1,2];
+function gJX(b){if([8,0,4].includes(b))return 0;if([5,9,1].includes(b))return 9;if([2,6,10].includes(b))return 6;if([11,3,7].includes(b))return 3;return -1;}
+function gHG(b){if([8,0,4].includes(b))return 4;if([5,9,1].includes(b))return 1;if([2,6,10].includes(b))return 10;if([11,3,7].includes(b))return 7;return -1;}
+function gCP(b){if([8,0,4].includes(b))return 2;if([5,9,1].includes(b))return 11;if([2,6,10].includes(b))return 8;if([11,3,7].includes(b))return 5;return -1;}
+function gTH(b){if([8,0,4].includes(b))return 9;if([5,9,1].includes(b))return 6;if([2,6,10].includes(b))return 3;if([11,3,7].includes(b))return 0;return -1;}
+function calcStars(tp,DT,YB,DB,lp){const nb=NTB[DT]||[],cJY=gJX(YB),cJD=gJX(DB),cHY=gHG(YB),cHD=gHG(DB),cCY=gCP(YB),cCD=gCP(DB),cTY=gTH(YB),cTD=gTH(DB);return tp.map(p=>{const s=new Set(),b=p.b,isYB=!lp&&b===YB,isDB=!lp&&b===DB;if(nb.includes(b))s.add('Noble 天乙');if(LU[DT]===b)s.add('Prospérité 禄');if(EP[DT]===b)s.add('Épée 羊刃');if(WC[DT]===b)s.add('Intellect 文昌');if(JY[DT]===b)s.add('Chariot d\'Or 金舆');if(cJY>=0&&b===cJY&&!isYB)s.add('Général 将星');if(cJD>=0&&b===cJD&&!isDB)s.add('Général 将星');if(cHY>=0&&b===cHY&&!isYB)s.add('Couverture 华盖');if(cHD>=0&&b===cHD&&!isDB)s.add('Couverture 华盖');if(cCY>=0&&b===cCY&&!isYB)s.add('Cheval postal 驿马');if(cCD>=0&&b===cCD&&!isDB)s.add('Cheval postal 驿马');if(cTY>=0&&b===cTY&&!isYB)s.add('Fleur de Pêche 桃花');if(cTD>=0&&b===cTD&&!isDB)s.add('Fleur de Pêche 桃花');return[...s];});}
+function getTG(dm,si){const dE=T[dm].e,dY=T[dm].y,sE=T[si].e,sY=T[si].y,sp=dY===sY;const g={Bois:'Feu',Feu:'Terre',Terre:'Métal',Métal:'Eau',Eau:'Bois'},c={Bois:'Terre',Feu:'Métal',Terre:'Eau',Métal:'Bois',Eau:'Feu'},gb={Feu:'Bois',Terre:'Feu',Métal:'Terre',Eau:'Métal',Bois:'Eau'};if(dE===sE)return sp?0:1;if(g[dE]===sE)return sp?2:3;if(c[dE]===sE)return sp?4:5;if(c[sE]===dE)return sp?6:7;if(gb[dE]===sE)return sp?8:9;return -1;}
+function ytf(y){return((y-4)%10+10)%10}function ybf(y){return((y-4)%12+12)%12}
+const AD=new Date(1986,1,26),AT=7,AB=1;
+function dayGZ(y,mo,d){const diff=Math.round((new Date(y,mo-1,d)-AD)/86400000);return{t:((AT+diff)%10+10)%10,b:((AB+diff)%12+12)%12};}
+function hbf(h){if(h===23||h===0)return 0;return Math.floor((h+1)/2)%12;}
+function htf(dt,hb){return([0,2,4,6,8][dt%5]+hb)%10}
+function nayin(ti,bi){return NY[(ti*6+Math.floor(bi/2))%60]||''}
+function hsCell(bi,dm,small){const hs=B[bi].hs,sc=small?'lp-hs-slot':'hs-slot',cc=small?'lp-hs':'cell-hs',fsC=small?'12px':'15px',fsE=small?'7px':'8px',fsG=small?'6px':'7px';let html=`<div class="${cc}">`;for(let i=0;i<3;i++){html+=`<div class="${sc}">`;if(i<hs.length){const hi=hs[i],col=ECOLS[T[hi].e],g=getTG(dm,hi);html+=`<div style="font-size:${fsC};color:${col}">${T[hi].c}</div><div style="font-size:${fsE};font-weight:500;color:${col}">${T[hi].fr}</div><div class="hs-god" style="font-size:${fsG}">${tgL(g)}</div>`;}html+=`</div>`;}return html+`</div>`;}
+function troncCell(ti,dm,isDM){const god=isDM?'MdJ':tgL(getTG(dm,ti)),col=ECOLS[T[ti].e];return`<div class="cell-tronc"><div class="cell-god">${god}</div><div style="font-size:9px;font-weight:500;color:${col}">${T[ti].fr}</div><div style="font-size:9px;color:${col}">${T[ti].p}</div><div style="font-size:30px;line-height:1;margin:2px 0;color:${col}">${T[ti].c}</div></div>`;}
+function branchCell(bi){const col=ECOLS[B[bi].e];return`<div style="display:flex;flex-direction:column;align-items:center;padding:8px 4px 6px;gap:2px"><div style="font-size:30px;line-height:1;margin:2px 0;color:${col}">${B[bi].c}</div><div style="font-size:9px;color:${col}">${B[bi].p} · <span style="font-weight:500">${B[bi].a}</span></div></div>`;}
+function lbl(t){const p=t.trim().split(' ');if(p.length>=2){const m=Math.ceil(p.length/2);return p.slice(0,m).join(' ')+'<br>'+p.slice(m).join(' ');}return t;}
+document.getElementById('calcBtn').addEventListener('click',function(){
+  const y=parseInt(document.getElementById('yr').value),m=parseInt(document.getElementById('mo').value),d=parseInt(document.getElementById('dy').value);
+  const{h,mn}=parseTime(document.getElementById('hr').value);
+  const gender=document.getElementById('gd').value;
+  const YT=ytf(y),YB=ybf(y),MB=getBaziMonth(y,m,d),MT=getMonthTronc(YT,MB);
+  const dg=dayGZ(y,m,d),DT=dg.t,DB=dg.b,HB=hbf(h),HT=htf(DT,HB);
+  const hLbl=`${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}`;
+  const pillars=[{label:'Heure 時',t:HT,b:HB,data:hLbl},{label:'Jour 日',t:DT,b:DB,data:`${d}`},{label:'Mois 月',t:MT,b:MB,data:MOIS_FR[m]},{label:'Année 年',t:YT,b:YB,data:`${y}`}];
+  const st=calcStars(pillars,DT,YB,DB,false);
+  const row=(lb,cells)=>`<tr><td class="row-label">${lbl(lb)}</td>${cells.map(c=>`<td class="col-pilier">${c}</td>`).join('')}</tr>`;
+  document.getElementById('baziTable').innerHTML=`<colgroup><col style="width:105px"><col><col><col><col></colgroup>`+row('Piliers',pillars.map(p=>`<div class="cell-header">${p.label}</div>`))+row('Date',pillars.map(p=>`<div class="cell-data">${p.data}</div>`))+row('Troncs célestes',pillars.map((p,i)=>troncCell(p.t,DT,i===1)))+row('Branches terrestres',pillars.map(p=>branchCell(p.b)))+row('Troncs cachés',pillars.map(p=>hsCell(p.b,DT,false)))+row('Étoiles',st.map(s=>`<div class="cell-stars">${s.length?s.join('<br>'):'&nbsp;'}</div>`))+row('Nayins',pillars.map(p=>`<div class="cell-nayin">${nayin(p.t,p.b)}</div>`));
+  const allP=[{t:YT,b:YB},{t:MT,b:MB},{t:DT,b:DB},{t:HT,b:HB}],dmE=T[DT].e,dmC=ECOLS[dmE];
+  const sup={Bois:'Eau',Feu:'Bois',Terre:'Feu',Métal:'Terre',Eau:'Métal'},sn=['Hiver','Hiver','Printemps','Printemps','Printemps','Été','Été','Été','Automne','Automne','Automne','Hiver'];
+  let sc2=0;if(B[MB].e===dmE)sc2+=100;else if(sup[dmE]===B[MB].e)sc2+=60;allP.forEach(p=>{if(T[p.t].e===dmE||T[p.t].e===sup[dmE])sc2+=20;if(B[p.b].e===dmE||B[p.b].e===sup[dmE])sc2+=15;});sc2=Math.min(sc2,400);
+  const sp2=Math.round(sc2/400*100),sl=sp2>60?'Fort':sp2>40?'Moyen':'Faible';
+  document.getElementById('dmDiv').innerHTML=`<div style="font-size:34px;color:${dmC}">${T[DT].c}</div><div class="dm-details"><div class="dm-name" style="color:${dmC}">${T[DT].fr} (${T[DT].p})</div><div class="dm-sub">Saison : ${sn[MB]} · Maître ${sl}</div><div class="sbar"><div class="sbar-fill" style="width:${sp2}%;background:${dmC}"></div></div><div class="sbar-lbl">Force : ${sc2} pts (${sp2}%)</div></div>`;
+  const eS={Bois:0,Feu:0,Terre:0,Métal:0,Eau:0};allP.forEach(p=>{eS[T[p.t].e]+=20;eS[B[p.b].e]+=15;B[p.b].hs.forEach(hi=>{eS[T[hi].e]+=5;});});
+  const tot=Object.values(eS).reduce((a,b)=>a+b,0);
+  const g2={Bois:'Feu',Feu:'Terre',Terre:'Métal',Métal:'Eau',Eau:'Bois'},c2={Bois:'Terre',Feu:'Métal',Terre:'Eau',Métal:'Bois',Eau:'Feu'},cb2={Terre:'Bois',Métal:'Feu',Eau:'Terre',Bois:'Métal',Feu:'Eau'},gb2={Feu:'Bois',Terre:'Feu',Métal:'Terre',Eau:'Métal',Bois:'Eau'};
+  const ro=['Ressource','Parallèle','Production','Richesse','Pouvoir'],ef={'Parallèle':dmE,'Production':g2[dmE],'Richesse':c2[dmE],'Pouvoir':cb2[dmE],'Ressource':gb2[dmE]};
+  document.getElementById('elemsDiv').innerHTML=ro.map(r=>{const el=ef[r],pct=tot>0?Math.round(eS[el]/tot*100):0,col=ECOLS[el];return`<div class="e-row"><span class="e-name" style="color:${col}">${el}</span><span class="e-role">${r}</span><div class="e-bg"><div class="e-fill" style="width:${pct}%;background:${col}"></div></div><span class="e-pct">${pct}%</span></div>`;}).join('');
+  const isYang=T[YT].y===1,isMale=gender==='m',fwd=(isYang&&isMale)||(!isYang&&!isMale);
+  let ct=MT,cb=MB;const lps=[];
+  for(let i=0;i<8;i++){if(fwd){ct=(ct+1)%10;cb=(cb+1)%12}else{ct=(ct+9)%10;cb=(cb+11)%12}lps.push({t:ct,b:cb,age:5+(i*10),sy:y+5+(i*10)});}
+  const cy=new Date().getFullYear(),lpst=calcStars(lps,DT,YB,DB,true);
+  document.getElementById('lpHeader').innerHTML=lps.map(lp=>`<div>${lp.age} ans</div>`).join('');
+  document.getElementById('lpTopGrid').innerHTML=lps.map(lp=>{const tC=ECOLS[T[lp.t].e],bC=ECOLS[B[lp.b].e];return`<div class="lp-col"><div class="lp-tronc"><div style="font-size:7px;color:#999">${tgL(getTG(DT,lp.t))}</div><div style="font-size:8px;font-weight:500;color:${tC}">${T[lp.t].fr}</div><div style="font-size:9px;color:${tC}">${T[lp.t].p}</div><div style="font-size:20px;line-height:1;margin:2px 0;color:${tC}">${T[lp.t].c}</div></div><div class="lp-div"></div><div class="lp-branch"><div style="font-size:20px;line-height:1;margin:2px 0;color:${bC}">${B[lp.b].c}</div><div style="font-size:8px;color:${bC}">${B[lp.b].p} · <span style="font-weight:500">${B[lp.b].a}</span></div></div><div class="lp-div" style="opacity:.5"></div>${hsCell(lp.b,DT,true)}</div>`;}).join('');
+  document.getElementById('lpStarsRow').innerHTML=lpst.map(s=>`<div class="lp-stars-cell">${s.length?s.join(' · '):'&nbsp;'}</div>`).join('');
+  document.getElementById('lpNayinRow').innerHTML=lps.map(lp=>`<div class="lp-nayin-cell">${nayin(lp.t,lp.b)}</div>`).join('');
+  document.getElementById('lpYearsGrid').innerHTML=lps.map(lp=>{let html='<div class="lp-years-col">';for(let ay=lp.sy;ay<lp.sy+10;ay++){const at=ytf(ay),ab=ybf(ay),cur=(ay===cy),tCY=ECOLS[T[at].e],bCY=ECOLS[B[ab].e];html+=`<div class="lp-year-item${cur?' cur':''}"><span class="lp-year-num">${ay}</span><div style="display:flex;align-items:baseline"><span style="font-size:13px;line-height:1;color:${tCY}">${T[at].c}</span><span style="font-size:13px;line-height:1;color:${bCY}">${B[ab].c}</span></div></div>`;}return html+'</div>';}).join('');
+  var r=document.getElementById('result');r.style.height='auto';r.style.overflow='visible';r.style.margin='';r.style.padding='';r.style.display='block';
+});
+</script>
+
+<script>
+(function(){
+  function bzSend(){
+    var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    window.parent.postMessage({type:'bz-resize',height:h},'*');
+  }
+  // Envoyer dès que le DOM est prêt
+  bzSend();
+  // Observer tous changements
+  if(window.MutationObserver){
+    new MutationObserver(bzSend).observe(document.body,{childList:true,subtree:true,attributes:true,characterData:true});
+  }
+  // Aussi sur resize fenêtre
+  window.addEventListener('resize', bzSend);
+})();
+</script>
+</body>
+</html>
