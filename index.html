@@ -111,7 +111,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:transparent;color
 /* ── STYLES IMPRESSION ── */
 @media print {
   /* Masquer tout sauf les résultats */
-  .section:first-child,          /* formulaire */
+  #form-section,
   .print-btn,
   .bazi-lp-years-title {display:none !important;}
 
@@ -156,7 +156,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:transparent;color
 </head>
 <body>
 <div class="app">
-<div class="section">
+<div class="section" id="form-section">
   <div class="sec-title">Données de naissance</div>
   <div class="form-card">
     <div class="form-row"><div class="form-label">Année</div><div class="form-input"><div class="spinner-wrap"><input type="number" id="yr" min="1900" max="2060" value="1986" oninput="updateDayMax()"><div class="spin-btns"><div class="spin-btn" onclick="spin('yr',1,1900,2060);updateDayMax()">▲</div><div class="spin-btn" onclick="spin('yr',-1,1900,2060);updateDayMax()">▼</div></div></div></div></div>
