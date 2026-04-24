@@ -29,8 +29,8 @@ body{font-family:system-ui,-apple-system,sans-serif;background:transparent;color
 .btn:hover{background:#f0f0ee}
 
 /* Tableau thème */
-.bazi-wrap{border:1.5px solid #888;border-radius:4px;overflow:hidden}
-.bazi-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.bazi-wrap{border:1.5px solid #888;border-radius:4px;overflow:hidden;display:inline-block}
+.bazi-table{border-collapse:collapse;table-layout:fixed;width:580px}
 .bazi-table td{border:0.5px solid #bbb;padding:0;vertical-align:middle}
 .row-label{font-size:10px;color:#555;text-align:center;vertical-align:middle;padding:6px 8px;background:#f5f5f3;width:105px;border-right:1.5px solid #888 !important;line-height:1.4}
 .col-pilier{text-align:center}
@@ -146,12 +146,12 @@ body{font-family:system-ui,-apple-system,sans-serif;background:transparent;color
 <div id="result" style="display:none;height:0;overflow:hidden;margin:0;padding:0">
   <div class="section" id="pr-top" style="text-align:left">
     <div class="sec-title">Les Quatre Piliers 四柱</div>
-    <div id="pr-main-row" style="display:flex;flex-direction:row;align-items:flex-start;gap:0">
-      <div id="pr-theme"><div class="bazi-wrap"><table class="bazi-table" id="baziTable"></table></div></div>
+    <div id="pr-main-row" style="display:flex;flex-direction:row;align-items:flex-start;gap:0;width:100%">
+      <div id="pr-theme" style="flex:0 0 auto;min-width:0"><div class="bazi-wrap" style="width:auto;display:inline-block"><table class="bazi-table" style="width:auto;table-layout:auto" id="baziTable"></table></div></div>
       <div style="flex:0 0 20px;min-width:20px"></div>
-      <div id="pr-curdayun" style="border:1.5px solid #888;border-radius:4px;overflow:hidden;background:#fff;min-width:110px;flex:0 0 auto"></div>
+      <div id="pr-curdayun" style="border:1.5px solid #888;border-radius:4px;overflow:hidden;background:#fff;width:120px;flex:0 0 120px"></div>
       <div style="flex:0 0 20px;min-width:20px"></div>
-      <div id="pr-curyear" style="border:1.5px solid #888;border-radius:4px;overflow:hidden;background:#fff;min-width:110px;flex:0 0 auto"></div>
+      <div id="pr-curyear" style="border:1.5px solid #888;border-radius:4px;overflow:hidden;background:#fff;width:120px;flex:0 0 120px"></div>
     </div>
   </div>
   <div class="section" id="pr-dm"><div class="sec-title">Maître du Jour 日主</div><div class="dm-section" id="dmDiv"></div></div>
